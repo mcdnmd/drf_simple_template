@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  wts_db:
+    image: postgres:13.4-alpine
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5434:5432"
+  wts_api:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - DJANGO_ENV=${DJANGO_ENV}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      - DB_ENGINE=${DB_ENGINE}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    volumes:
+      - .:/home/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - wts_db
